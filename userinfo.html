@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Data Page</title>
+    <style>
+        /* Stilark til layoutet */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .user-info p {
+            margin: 0;
+        }
+
+        /* Stilark for adresseblokken */
+        .address {
+            margin-top: 10px;
+        }
+
+        .address p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>User Information</h1>
+    <div class="search-box">
+        <label for="userIdInput">Search User by ID:</label>
+        <input type="number" id="userIdInput" min="1" placeholder="Enter User ID">
+        <button id="searchButton">Get User</button>
+        <button id="allUsers">Get All</button>
+    </div>
+
+    <div class="user-info" id="user-info">
+
+    </div>
+    <script>
+        // Funktion til at hente og vise brugerdata for en given bruger-id
+        function fetchUserData(userId) {
+            const url = `https://jsonplaceholder.typicode.com/users/${userId}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    // Opdater UI med brugerdata
+                    const userInfoElement = document.getElementById('user-info');
+                    userInfoElement.innerHTML = `
+                        <p><strong>Name:</strong> ${data.name}</p>
+                        <p><strong>Username:</strong> ${data.username}</p>
+                        <p><strong>Email:</strong> ${data.email}</p>
+                        <div class="address">
+                            <p><strong>Address:</strong></p>
+                            <p>${data.address.street}, ${data.address.suite}</p>
+                            <p>${data.address.city}, ${data.address.zipcode}</p>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Fejl ved hentning af brugerdata:', error);
+                });
+        }
+
+        // Håndter søgning ved at klikke på knappen
+        document.getElementById('searchButton').addEventListener('click', () => {
+            const userIdInput = document.getElementById('userIdInput');
+            const userId = userIdInput.value;
+            if (userId) {
+                fetchUserData(userId);
+            }
+        });
+
+        // Håndter "Get All" knappen
+        document.getElementById('allUsers').addEventListener('click', () => {
+            const url = 'https://jsonplaceholder.typicode.com/users';
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    // Opdater UI med liste over alle brugere
+                    const userInfoElement = document.getElementById('user-info');
+                    userInfoElement.innerHTML = '<h2>All Users</h2>';
+                    data.forEach(user => {
+                        userInfoElement.innerHTML += `
+                        <div class="user-info">
+                            <p><strong>Name:</strong> ${user.name}</p>
+                            <p><strong>Username:</strong> ${user.username}</p>
+                            <p><strong>Email:</strong> ${user.email}</p>
+                            <div class="address">
+                                <p><strong>Address:</strong></p>
+                                <p>${user.address.street}, ${user.address.suite}</p>
+                                <p>${user.address.city}, ${user.address.zipcode}</p>
+                            </div>
+                        </div>
+                        <hr>
+                    `;
+                    });
+                })
+                .catch(error => {
+                    console.error('Fejl ved hentning af brugerdata:', error);
+                });
+        });
+
+        // Kald fetchUserData-funktionen for at vise standardbruger (bruger-id 1) ved indlæsning
+        fetchUserData(1);
+    </script>
+
+</div>
+</body>
+</html>
